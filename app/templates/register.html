@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}Register - Quiz System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-body">
+                <h2 class="card-title text-center mb-4">Register</h2>
+                
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="user_type" class="form-label">Register As:</label>
+                        <select class="form-select" id="user_type" name="user_type" required onchange="toggleClassField()">
+                            <option value="">Select...</option>
+                            <option value="teacher">Teacher</option>
+                            <option value="student">Student</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Full Name:</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email:</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+
+                    <div class="mb-3" id="class_field" style="display:none;">
+                        <label for="class" class="form-label">Class:</label>
+                        <input type="text" class="form-control" id="class" name="class" placeholder="e.g., Class 10-A">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password:</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="confirm_password" class="form-label">Confirm Password:</label>
+                        <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">Register</button>
+                </form>
+
+                <hr>
+
+                <p class="text-center">Already have an account? <a href="{{ url_for('auth.login') }}">Login here</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleClassField() {
+    const userType = document.getElementById('user_type').value;
+    const classField = document.getElementById('class_field');
+    if (userType === 'student') {
+        classField.style.display = 'block';
+    } else {
+        classField.style.display = 'none';
+    }
+}
+</script>
+{% endblock %}

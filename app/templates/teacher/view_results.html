@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Quiz Results - Quiz System{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h2>Results: {{ quiz[2] }}</h2>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Total Attempts</h6>
+                <h3>{{ stats.total_attempts }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Average Score</h6>
+                <h3>{{ stats.average_score }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Highest Score</h6>
+                <h3>{{ stats.highest_score }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Lowest Score</h6>
+                <h3>{{ stats.lowest_score }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <h4>Results Leaderboard</h4>
+        {% if results %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Student Name</th>
+                    <th>Email</th>
+                    <th>Score</th>
+                    <th>Percentage</th>
+                    <th>Submitted</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for result in results %}
+                <tr>
+                    <td><strong>{{ loop.index }}</strong></td>
+                    <td>{{ result[9] }}</td>
+                    <td>{{ result[10] }}</td>
+                    <td>{{ result[3] }} / {{ quiz[4] }}</td>
+                    <td>{{ ((result[3] / quiz[4]) * 100)|round(2) }}%</td>
+                    <td>{{ result[7].strftime('%Y-%m-%d %H:%M') if result[7] else 'N/A' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="alert alert-info">No results yet.</div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="mt-4">
+    <a href="{{ url_for('teacher.dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+</div>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Quiz Result{% endblock %}
+
+{% block content %}
+{% set correct_count = answers|selectattr('4')|list|length %}
+{% set total_questions = answers|length %}
+{% set percentage = ((correct_count / total_questions) * 100)|round(2) if total_questions > 0 else 0 %}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body text-center">
+                <h2>Quiz Completed!</h2>
+                <h3 class="display-4">{{ correct_count }} / {{ total_questions }}</h3>
+                <p class="text-muted">Percentage: {{ percentage }}%</p>
+                {% if result[4] %}
+                <p><strong>Your Rank:</strong> <span class="badge bg-primary">{{ result[4] }}</span></p>
+                {% endif %}
+            </div>
+        </div>
+
+        <h4 class="mt-4">Answer Review</h4>
+        
+        {% for answer in answers %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6>Question {{ loop.index }}</h6>
+                        <p class="mb-2">{{ answer[2] }}</p>
+                    </div>
+                    <div>
+                        {% if answer[4] %}
+                            <span class="badge bg-success">CORRECT</span>
+                        {% else %}
+                            <span class="badge bg-danger">INCORRECT</span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <small class="text-muted">
+                    Your Answer: {{ answer[3] if answer[3] else 'Not answered' }}<br>
+                    Marks Obtained: {{ answer[5] }}
+                </small>
+            </div>
+        </div>
+        {% endfor %}
+
+        <div class="mt-4">
+            <a href="{{ url_for('student.dashboard') }}" class="btn btn-primary">Back to Dashboard</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

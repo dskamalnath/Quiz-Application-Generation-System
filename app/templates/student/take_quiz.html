@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}{{ quiz[2] }} - Take Quiz{% endblock %}
+
+{% block extra_css %}
+<style>
+    #timer {
+        font-size: 24px;
+        font-weight: bold;
+    }
+    .question-card {
+        margin-bottom: 30px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2>{{ quiz[2] }}</h2>
+    </div>
+    <div class="col-md-4 text-end">
+        <h5>Time Remaining</h5>
+        <div id="timer" class="text-danger">{{ quiz[5] }}:00</div>
+    </div>
+</div>
+
+<form method="POST" id="quizForm">
+    {% for question in questions %}
+    <div class="card question-card">
+        <div class="card-body">
+            <h5>Question {{ loop.index }} (Marks: {{ question[5] }})</h5>
+            <p class="lead">{{ question[2] }}</p>
+
+            <div class="options mt-4">
+                {% set options = question[3] %}
+
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="question_{{ question[0] }}" 
+                           id="option_{{ question[0] }}_0" value="0" required>
+                    <label class="form-check-label" for="option_{{ question[0] }}_0">
+                        A) {{ options[0] if options|length > 0 else 'Option A' }}
+                    </label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="question_{{ question[0] }}" 
+                           id="option_{{ question[0] }}_1" value="1">
+                    <label class="form-check-label" for="option_{{ question[0] }}_1">
+                        B) {{ options[1] if options|length > 1 else 'Option B' }}
+                    </label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="question_{{ question[0] }}" 
+                           id="option_{{ question[0] }}_2" value="2">
+                    <label class="form-check-label" for="option_{{ question[0] }}_2">
+                        C) {{ options[2] if options|length > 2 else 'Option C' }}
+                    </label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="question_{{ question[0] }}" 
+                           id="option_{{ question[0] }}_3" value="3">
+                    <label class="form-check-label" for="option_{{ question[0] }}_3">
+                        D) {{ options[3] if options|length > 3 else 'Option D' }}
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+    <div class="mb-4">
+        <button type="submit" class="btn btn-success btn-lg">Submit Quiz</button>
+        <button type="reset" class="btn btn-secondary btn-lg">Clear Answers</button>
+    </div>
+</form>
+
+<script>
+// Timer functionality
+let timeLeft = {{ quiz[5] }} * 60; // Convert minutes to seconds
+const totalTime = timeLeft;
+
+function updateTimer() {
+    const minutes = Math.floor(timeLeft / 60);
+    const seconds = timeLeft % 60;
+    document.getElementById('timer').textContent = 
+        String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+    
+    if (timeLeft <= 0) {
+        document.getElementById('quizForm').submit();
+    } else if (timeLeft <= 60) {
+        document.getElementById('timer').classList.add('text-danger');
+    }
+    
+    timeLeft--;
+}
+
+setInterval(updateTimer, 1000);
+
+// Flag to track if form was submitted
+let formSubmitted = false;
+
+// Prevent accidental submission
+document.getElementById('quizForm').addEventListener('submit', function(e) {
+    if (!confirm('Are you sure you want to submit the quiz?')) {
+        e.preventDefault();
+    } else {
+        formSubmitted = true;
+    }
+});
+
+// Warn if user tries to leave without submitting
+window.addEventListener('beforeunload', function(e) {
+    if (!formSubmitted) {
+        e.preventDefault();
+        e.returnValue = '';
+    }
+});
+</script>
+{% endblock %}

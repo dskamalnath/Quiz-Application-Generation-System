@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Teacher Dashboard - Quiz System{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h1>Teacher Dashboard</h1>
+        <p class="text-muted">Welcome, {{ session.get('user_name') }}!</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="stat-box stat-box-1">
+            <h6>Total Quizzes</h6>
+            <h3>{{ data.total_quizzes }}</h3>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <a href="{{ url_for('teacher.create_quiz') }}" class="btn btn-success">+ Create New Quiz</a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <h3>Your Quizzes</h3>
+        {% if data.quizzes %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Total Marks</th>
+                    <th>Time Limit (min)</th>
+                    <th>Questions</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for quiz in data.quizzes %}
+                <tr>
+                    <td>{{ quiz[2] }}</td>
+                    <td>{{ quiz[4] }}</td>
+                    <td>{{ quiz[5] }}</td>
+                    <td>
+                        {% if quiz|length > 8 and quiz[8] %}
+                        <span class="badge bg-gradient-info">{{ quiz[8] }} {{ 'question' if quiz[8] == 1 else 'questions' }}</span>
+                        {% else %}
+                        <span class="badge bg-secondary">Not set</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if quiz[7] %}
+                            <span class="badge bg-success">Active</span>
+                        {% else %}
+                            <span class="badge bg-secondary">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ quiz[6].strftime('%Y-%m-%d %H:%M') if quiz[6] }}</td>
+                    <td>
+                        <a href="{{ url_for('teacher.edit_quiz', quiz_id=quiz[0]) }}" class="btn btn-sm btn-primary">Edit</a>
+                        <a href="{{ url_for('teacher.view_results', quiz_id=quiz[0]) }}" class="btn btn-sm btn-info">Results</a>
+                        <button class="btn btn-sm btn-warning" onclick="toggleQuiz({{ quiz[0] }})">
+                            {% if quiz[7] %}Deactivate{% else %}Activate{% endif %}
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="alert alert-info">No quizzes created yet. <a href="{{ url_for('teacher.create_quiz') }}">Create one now</a></div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function toggleQuiz(quizId) {
+    fetch(`/teacher/toggle-quiz/${quizId}`, {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+</script>
+{% endblock %}

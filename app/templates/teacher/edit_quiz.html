@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Quiz - Quiz System{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h2>{{ quiz[2] }}</h2>
+        <p class="text-muted">Total Marks: {{ quiz[4] }} | Time Limit: {{ quiz[5] }} minutes</p>
+        
+        {% if quiz|length > 8 and quiz[8] %}
+        <div class="alert alert-info mt-3">
+            <strong>Questions Progress:</strong>
+            <div class="progress mt-2" style="height: 30px;">
+                {% set current_count = questions|length if questions else 0 %}
+                {% set required = quiz[8] %}
+                {% set percentage = (current_count / required * 100)|int if required > 0 else 0 %}
+                <div class="progress-bar bg-gradient-primary" role="progressbar" style="width: {{ percentage }}%; color: white; font-weight: bold;" 
+                     aria-valuenow="{{ current_count }}" aria-valuemin="0" aria-valuemax="{{ required }}">
+                    {{ current_count }} / {{ required }} Questions
+                </div>
+            </div>
+            {% if current_count >= required %}
+                <span class="badge bg-success mt-2">✓ All questions added!</span>
+            {% else %}
+                <span class="badge bg-warning mt-2">{{ required - current_count }} more needed</span>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<ul class="nav nav-tabs mb-4" role="tablist">
+    <li class="nav-item">
+        <a class="nav-link active" data-bs-toggle="tab" href="#details">Quiz Details</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#questions">Questions ({{ questions|length if questions else 0 }})</a>
+    </li>
+</ul>
+
+<div class="tab-content">
+    <!-- Quiz Details Tab -->
+    <div class="tab-pane fade show active" id="details">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="mb-4">Quiz Information</h5>
+                <p><strong>Title:</strong> {{ quiz[2] }}</p>
+                <p><strong>Description:</strong> {{ quiz[3] or 'No description' }}</p>
+                <p><strong>Total Marks:</strong> {{ quiz[4] }}</p>
+                <p><strong>Time Limit:</strong> {{ quiz[5] }} minutes</p>
+                <p><strong>Status:</strong> 
+                    {% if quiz[7] %}
+                        <span class="badge bg-success">Active</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Inactive</span>
+                    {% endif %}
+                </p>
+                <p><strong>Created:</strong> {{ quiz[6].strftime('%Y-%m-%d %H:%M') if quiz[6] }}</p>
+
+                <hr>
+                <h6 class="mb-3">🎯 Set Number of Questions</h6>
+                <form method="POST" action="{{ url_for('teacher.edit_quiz', quiz_id=quiz[0]) }}" class="d-flex gap-2 align-items-end">
+                    <div class="flex-grow-1" style="max-width: 300px;">
+                        <label for="num_questions" class="form-label">How many questions should this quiz have?</label>
+                        <input type="number" class="form-control" id="num_questions" name="num_questions" 
+                               value="{{ quiz[8] if quiz|length > 8 and quiz[8] else '' }}" 
+                               min="1" max="100" placeholder="e.g., 5">
+                    </div>
+                    <button type="submit" class="btn btn-gradient-primary">
+                        <i class="fas fa-save"></i> Set Questions
+                    </button>
+                </form>
+                {% if quiz|length > 8 and quiz[8] %}
+                <div class="alert alert-info mt-3">
+                    <strong>Current Setting:</strong> This quiz requires <strong>{{ quiz[8] }}</strong> questions
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Questions Tab -->
+    <div class="tab-pane fade" id="questions">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="mb-4">Questions</h5>
+
+                <form method="POST" action="{{ url_for('teacher.add_question', quiz_id=quiz[0]) }}" id="questionForm">
+                    <div class="card mb-4 bg-light">
+                        <div class="card-body">
+                            <h6>Add New Question</h6>
+
+                            <div class="mb-3">
+                                <label for="question_text" class="form-label">Question *</label>
+                                <textarea class="form-control" id="question_text" name="question_text" rows="3" required></textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Options *</label>
+                                <div id="optionsContainer">
+                                    <div class="input-group mb-2">
+                                        <span class="input-group-text">A)</span>
+                                        <input type="text" class="form-control" name="options" required>
+                                    </div>
+                                    <div class="input-group mb-2">
+                                        <span class="input-group-text">B)</span>
+                                        <input type="text" class="form-control" name="options" required>
+                                    </div>
+                                    <div class="input-group mb-2">
+                                        <span class="input-group-text">C)</span>
+                                        <input type="text" class="form-control" name="options" required>
+                                    </div>
+                                    <div class="input-group mb-2">
+                                        <span class="input-group-text">D)</span>
+                                        <input type="text" class="form-control" name="options" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="correct_answer" class="form-label">Correct Answer *</label>
+                                <select class="form-select" id="correct_answer" name="correct_answer" required>
+                                    <option value="">Select...</option>
+                                    <option value="0">A</option>
+                                    <option value="1">B</option>
+                                    <option value="2">C</option>
+                                    <option value="3">D</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="marks" class="form-label">Marks</label>
+                                <input type="number" class="form-control" id="marks" name="marks" value="1" min="1">
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">Add Question</button>
+                        </div>
+                    </div>
+                </form>
+
+                {% if questions %}
+                <h6 class="mt-4 mb-3">Questions Added ({{ questions|length }})</h6>
+                {% for question in questions %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h6>Question {{ loop.index }}</h6>
+                        <p><strong>{{ question[2] }}</strong></p>
+                        <p class="text-muted">
+                            Options: 
+                            {% for opt in question[3]|list %}
+                                {{ loop.index }}. {{ opt }}{% if not loop.last %}, {% endif %}
+                            {% endfor %}
+                        </p>
+                        <p><small>Correct Answer: {{ question[3]|list|safe }}, Marks: {{ question[5] }}</small></p>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="alert alert-info">No questions added yet.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('questionForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    
+    fetch('{{ url_for("teacher.add_question", quiz_id=quiz[0]) }}', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Error adding question: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error adding question');
+    });
+});
+</script>
+{% endblock %}

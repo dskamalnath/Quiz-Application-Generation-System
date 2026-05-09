@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Student Dashboard - Quiz System{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h1>Student Dashboard</h1>
+        <p class="text-muted">Welcome, {{ session.get('user_name') }}!</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="stat-box stat-box-1">
+            <h6>Available Quizzes</h6>
+            <h3>{{ data.active_quizzes|length }}</h3>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-box stat-box-2">
+            <h6>Completed</h6>
+            <h3>{{ data.results|length }}</h3>
+        </div>
+    </div>
+    {% if data.results %}
+    <div class="col-md-3">
+        <div class="stat-box stat-box-3">
+            <h6>Average Score</h6>
+            <h3>{{ ((data.results|map(attribute=3)|sum / (data.results|map(attribute=10)|sum)) * 100)|round(1) }}%</h3>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h3>Available Quizzes</h3>
+        {% if data.active_quizzes %}
+        <div class="row">
+            {% for quiz in data.active_quizzes %}
+            <div class="col-md-6 mb-3">
+                <div class="quiz-card">
+                    <h5>{{ quiz[2] }}</h5>
+                    <p class="text-muted">{{ quiz[3] or 'No description' }}</p>
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <small><strong>Total Marks:</strong> {{ quiz[4] }}</small>
+                        </div>
+                        <div class="col-6">
+                            <small><strong>Time Limit:</strong> {{ quiz[5] }} min</small>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="{{ url_for('quiz.start_quiz', quiz_id=quiz[0]) }}" class="btn btn-primary btn-sm">Take Quiz</a>
+                        <a href="{{ url_for('student.leaderboard', quiz_id=quiz[0]) }}" class="btn btn-info btn-sm">Leaderboard</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="alert alert-info">No quizzes available at the moment.</div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <h3>Your Results</h3>
+        {% if data.results %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Quiz Title</th>
+                    <th>Score</th>
+                    <th>Percentage</th>
+                    <th>Rank</th>
+                    <th>Submitted</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for result in data.results %}
+                <tr>
+                    <td>{{ result[9] }}</td>
+                    <td>{{ result[3] }}/{{ result[10] }}</td>
+                    <td>{{ ((result[3] / result[10]) * 100)|round(2) }}%</td>
+                    <td>{{ result[4] if result[4] else 'N/A' }}</td>
+                    <td>{{ result[7].strftime('%Y-%m-%d %H:%M') if result[7] else 'N/A' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="alert alert-info">You haven't taken any quizzes yet.</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

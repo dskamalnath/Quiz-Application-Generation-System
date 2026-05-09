@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}{{ quiz[2] }} - Start Quiz{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <h2>{{ quiz[2] }}</h2>
+                <p>{{ quiz[3] or 'No description' }}</p>
+
+                <hr>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h6>Quiz Details</h6>
+                        <p><strong>Total Marks:</strong> {{ quiz[4] }}</p>
+                        <p><strong>Time Limit:</strong> {{ quiz[5] }} minutes</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Instructions</h6>
+                        <ul>
+                            <li>Read all questions carefully</li>
+                            <li>You cannot pause the quiz once started</li>
+                            <li>Select only one answer per question</li>
+                            <li>You must complete within the time limit</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <form method="POST" action="{{ url_for('quiz.start_quiz', quiz_id=quiz[0]) }}">
+                    <div class="alert alert-warning">
+                        <strong>⚠️ Important:</strong> Once you start this quiz, you cannot pause. Make sure you're ready!
+                    </div>
+                    
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="confirm" required>
+                        <label class="form-check-label" for="confirm">
+                            I understand the instructions and I'm ready to take the quiz
+                        </label>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-success">Start Quiz</button>
+                        <a href="{{ url_for('student.dashboard') }}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
