@@ -410,6 +410,6 @@ This project is licensed under the MIT License - see [LICENSE](LICENSE) file for
 
 ### ⭐ If you found this project helpful, please consider giving it a star!
 
-Made with ❤️ by [Your Name]
+Made with ❤️ by KAMALNATH D S
 
 </div>
